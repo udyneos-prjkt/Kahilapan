@@ -1,4 +1,4 @@
-// MainActivity.kt
+// app/src/main/java/com/dinsoft/notes/MainActivity.kt
 package com.dinsoft.notes
 
 import android.os.Bundle
@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.dinsoft.notes.ui.screens.NoteScreen
-import com.dinsoft.notes.ui.Theme.Theme
-
+import com.dinsoft.notes.ui.Theme.NotesTheme
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
