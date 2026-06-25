@@ -36,7 +36,6 @@ jobs:
          
     - name: Build APK
       run: |
-         cat ${{ github.event.inputs.buildType }
          if [ "${{ github.event.inputs.buildType }}" == "debug" ]; then
            ./gradlew assembleDebug
          else
