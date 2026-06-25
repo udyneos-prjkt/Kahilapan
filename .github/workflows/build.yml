@@ -45,13 +45,12 @@ jobs:
     - name: Upload APK to Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Kahilapan
+        name: Kahilapan-artifact
         path: |
           app/build/outputs/apk/debug/*.apk
           app/build/outputs/apk/release/*.apk
     
     - name: Upload to Release
-      if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
       uses: softprops/action-gh-release@v2
       with:
         files: |
