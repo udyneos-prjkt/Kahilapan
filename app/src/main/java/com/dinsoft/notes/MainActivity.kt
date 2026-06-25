@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.dinsoft.notes.ui.screens.NoteScreen
-import com.dinsoft.notes.ui.theme.NotesTheme
+import com.dinsoft.notes.ui.Theme
+
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NotesTheme {
+            Theme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     NoteScreen(viewModel = viewModel)
                 }

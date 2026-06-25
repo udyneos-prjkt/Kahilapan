@@ -1,5 +1,5 @@
 // Color.kt
-package com.dinsoft.notes.ui.theme
+package com.dinsoft.notes.ui.Theme
 
 import androidx.compose.ui.graphics.Color
 
