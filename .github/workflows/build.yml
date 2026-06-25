@@ -2,10 +2,8 @@ name: Build Kahilapan apk
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # ← INI YANG HARUS DITAMBAHKAN
+    branches: [ debug ]
+  workflow_dispatch:
     inputs:
       buildType:
         description: 'Build type'
