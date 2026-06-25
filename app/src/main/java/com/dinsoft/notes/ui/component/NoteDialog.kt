@@ -1,5 +1,5 @@
 // app/src/main/java/com/dinsoft/notes/ui/Component/NoteDialog.kt
-package com.dinsoft.notes.ui.Component
+package com.dinsoft.notes.ui.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

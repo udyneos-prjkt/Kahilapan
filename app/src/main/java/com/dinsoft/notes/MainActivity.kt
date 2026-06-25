@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.dinsoft.notes.ui.screens.NoteScreen
 import com.dinsoft.notes.ui.screens.SplashScreen
-import com.dinsoft.notes.ui.theme.NotesTheme  // PASTIKAN folder "theme" lowercase
+import com.dinsoft.notes.ui.theme.NotesTheme 
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
