@@ -30,10 +30,9 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: Setup and Cleanup
+    - name: Setup
       run: |
          chmod +x gradlew
-         ./gradlew clean
          
     - name: Build APK
       run: |
