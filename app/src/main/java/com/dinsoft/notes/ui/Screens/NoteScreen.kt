@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.data.Note
+import com.dinsoft.notes.ui.Component.BackupRestoreDialog
 import com.dinsoft.notes.ui.Component.NoteCard
 import com.dinsoft.notes.ui.Component.NoteDialog
 import com.dinsoft.notes.viewmodel.NoteViewModel
@@ -24,6 +25,8 @@ fun NoteScreen(viewModel: NoteViewModel) {
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
+    var showBackupDialog by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -36,15 +39,55 @@ fun NoteScreen(viewModel: NoteViewModel) {
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Kahilapan")
+                        Text("📝 Notes")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(Icons.Default.Search, "Search")
+                    // Backup & Restore Button
+                    IconButton(onClick = { showBackupDialog = true }) {
+                        Icon(Icons.Default.Backup, "Backup & Restore")
+                    }
+                    
+                    // Menu Dropdown
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, "More")
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Backup & Restore") },
+                                onClick = {
+                                    showMenu = false
+                                    showBackupDialog = true
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Backup, null)
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("Delete All Notes") },
+                                onClick = {
+                                    showMenu = false
+                                    noteToDelete = null
+                                    showDeleteDialog = true
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.DeleteSweep,
+                                        null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             )
@@ -55,8 +98,8 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     selectedNote = null
                     showDialog = true
                 },
-                icon = { Icon(Icons.Default.Add, "Baru") },
-                text = { Text("Buat Baru") }
+                icon = { Icon(Icons.Default.Add, "Add") },
+                text = { Text("New Note") }
             )
         }
     ) { padding ->
@@ -103,23 +146,42 @@ fun NoteScreen(viewModel: NoteViewModel) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Hapus") },
-            text = { Text("Ainul yakin?") },
+            title = { Text(if (noteToDelete != null) "Delete Note" else "Delete All Notes") },
+            text = { 
+                Text(
+                    if (noteToDelete != null) 
+                        "Are you sure you want to delete this note?" 
+                    else 
+                        "Are you sure you want to delete ALL notes? This action cannot be undone!"
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        noteToDelete?.let { viewModel.deleteNote(it) }
+                        if (noteToDelete != null) {
+                            viewModel.deleteNote(noteToDelete!!)
+                        } else {
+                            viewModel.deleteAllNotes()
+                        }
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Hapus", color = MaterialTheme.colorScheme.error)
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Batal")
+                    Text("Cancel")
                 }
             }
+        )
+    }
+    
+    // Backup Restore Dialog
+    if (showBackupDialog) {
+        BackupRestoreDialog(
+            viewModel = viewModel,
+            onDismiss = { showBackupDialog = false }
         )
     }
 }
@@ -142,13 +204,13 @@ fun EmptyState(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Tidak ada catatan",
+                "No notes yet",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Tap + Biar tidak ada dalam kekhilafan",
+                "Tap + to create your first note",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
