@@ -1,6 +1,6 @@
 <!-- res/values/themes.xml -->
 <resources>
     <style name="Theme.Notes" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/teal_200</item>
+        <item name="android:statusBarColor">@android:color/primary</item>
     </style>
 </resources>
