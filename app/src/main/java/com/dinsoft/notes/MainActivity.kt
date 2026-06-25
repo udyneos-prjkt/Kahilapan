@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.dinsoft.notes.ui.screens.NoteScreen
-import com.dinsoft.notes.ui.Theme
+import com.dinsoft.notes.ui.Theme.Theme
 
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
