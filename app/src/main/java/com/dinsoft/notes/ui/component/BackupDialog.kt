@@ -1,5 +1,5 @@
-// app/src/main/java/com/dinsoft/notes/ui/Component/BackupRestoreDialog.kt
-package com.dinsoft.notes.ui.Component
+// app/src/main/java/com/dinsoft/notes/ui/component/BackupDialog.kt
+package com.dinsoft.notes.ui.component
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,19 +11,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @Composable
-fun BackupRestoreDialog(
+fun BackupDialog(
     viewModel: NoteViewModel,
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
-    var showBackupConfirm by remember { mutableStateOf(false) }
-    var showRestoreConfirm by remember { mutableStateOf(false) }
-    
     // File picker untuk backup (create)
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -78,7 +73,10 @@ fun BackupRestoreDialog(
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                HorizontalDivider()
+                // GANTI HorizontalDivider dengan Divider
+                Divider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                )
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 

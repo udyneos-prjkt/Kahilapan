@@ -12,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.data.Note
-import com.dinsoft.notes.ui.Component.BackupRestoreDialog
-import com.dinsoft.notes.ui.Component.NoteCard
-import com.dinsoft.notes.ui.Component.NoteDialog
+import com.dinsoft.notes.ui.component.BackupDialog
+import com.dinsoft.notes.ui.component.NoteCard
+import com.dinsoft.notes.ui.component.NoteDialog
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +26,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
     var showBackupDialog by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -46,48 +45,9 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    // Backup & Restore Button
+                    // Backup Button
                     IconButton(onClick = { showBackupDialog = true }) {
                         Icon(Icons.Default.Backup, "Backup & Restore")
-                    }
-                    
-                    // Menu Dropdown
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, "More")
-                        }
-                        
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Backup & Restore") },
-                                onClick = {
-                                    showMenu = false
-                                    showBackupDialog = true
-                                },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Backup, null)
-                                }
-                            )
-                            
-                            DropdownMenuItem(
-                                text = { Text("Delete All Notes") },
-                                onClick = {
-                                    showMenu = false
-                                    noteToDelete = null
-                                    showDeleteDialog = true
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.DeleteSweep,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            )
-                        }
                     }
                 }
             )
@@ -146,13 +106,15 @@ fun NoteScreen(viewModel: NoteViewModel) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(if (noteToDelete != null) "Delete Note" else "Delete All Notes") },
+            title = { 
+                Text(if (noteToDelete != null) "Delete Note" else "Delete All Notes") 
+            },
             text = { 
                 Text(
                     if (noteToDelete != null) 
                         "Are you sure you want to delete this note?" 
                     else 
-                        "Are you sure you want to delete ALL notes? This action cannot be undone!"
+                        "Are you sure you want to delete ALL notes?"
                 )
             },
             confirmButton = {
@@ -177,9 +139,9 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
-    // Backup Restore Dialog
+    // Backup Dialog
     if (showBackupDialog) {
-        BackupRestoreDialog(
+        BackupDialog(
             viewModel = viewModel,
             onDismiss = { showBackupDialog = false }
         )

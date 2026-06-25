@@ -1,5 +1,5 @@
-// Theme.kt
-package com.dinsoft.notes.ui.Theme
+// app/src/main/java/com/dinsoft/notes/ui/theme/Theme.kt
+package com.dinsoft.notes.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,41 +16,48 @@ import androidx.compose.ui.unit.sp
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
-
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
-
-// Custom Colors
 val DarkSurface = Color(0xFF1E1E1E)
 val DarkBackground = Color(0xFF121212)
-val AccentBlue = Color(0xFF4FC3F7)
-val AccentGreen = Color(0xFF81C784)
-val CardColor1 = Color(0xFF2D2D2D)
-val CardColor2 = Color(0xFF333333)
 
-// Typography Material3
-val AppTypography = Typography(
-    bodyLarge = TextStyle(
+// Typography
+val Typography = Typography(
+    headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontSize = 16.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
     ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 11.sp
     )
 )
 
@@ -59,9 +66,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = PurpleGrey80,
     tertiary = Pink80,
     background = DarkBackground,
-    surface = DarkSurface,
-    onPrimary = Color.Black,
-    onBackground = Purple80
+    surface = DarkSurface
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -88,7 +93,7 @@ fun NotesTheme(
     
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = AppTypography,
+        typography = Typography,
         content = content
     )
 }
