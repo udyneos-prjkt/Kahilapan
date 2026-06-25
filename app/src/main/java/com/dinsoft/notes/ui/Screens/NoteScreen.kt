@@ -16,7 +16,7 @@ import com.dinsoft.notes.ui.Component.NoteCard
 import com.dinsoft.notes.ui.Component.NoteDialog
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)  // ← TAMBAHKAN INI
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteScreen(viewModel: NoteViewModel) {
     val notesState by viewModel.notes.collectAsState()
@@ -28,10 +28,25 @@ fun NoteScreen(viewModel: NoteViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("📝 Notes") },
+                title = { 
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.NoteAlt,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Kahilapan")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
-                )
+                ),
+                actions = {
+                    IconButton(onClick = { /* Search */ }) {
+                        Icon(Icons.Default.Search, "Search")
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -40,8 +55,8 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     selectedNote = null
                     showDialog = true
                 },
-                icon = { Icon(Icons.Default.Add, "Add") },
-                text = { Text("New Note") }
+                icon = { Icon(Icons.Default.Add, "Baru") },
+                text = { Text("Buat Baru") }
             )
         }
     ) { padding ->
@@ -72,6 +87,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
         }
     }
     
+    // Note Dialog
     if (showDialog) {
         NoteDialog(
             note = selectedNote,
@@ -83,11 +99,12 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
+    // Delete Confirmation
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Note") },
-            text = { Text("Are you sure you want to delete this note?") },
+            title = { Text("Hapus") },
+            text = { Text("Ainul yakin?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -95,12 +112,12 @@ fun NoteScreen(viewModel: NoteViewModel) {
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Hapus", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text("Batal")
                 }
             }
         )
@@ -125,13 +142,13 @@ fun EmptyState(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "No notes yet",
+                "Tidak ada catatan",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Tap + to create your first note",
+                "Tap + Biar tidak ada dalam kekhilafan",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )

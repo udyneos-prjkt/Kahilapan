@@ -7,9 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.dinsoft.notes.ui.screens.NoteScreen
-import com.dinsoft.notes.ui.Theme.NotesTheme
+import com.dinsoft.notes.ui.screens.SplashScreen
+import com.dinsoft.notes.ui.theme.NotesTheme
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +21,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NotesTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    NoteScreen(viewModel = viewModel)
+                var showSplash by remember { mutableStateOf(true) }
+                
+                if (showSplash) {
+                    SplashScreen(
+                        onSplashFinished = {
+                            showSplash = false
+                        }
+                    )
+                } else {
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        NoteScreen(viewModel = viewModel)
+                    }
                 }
             }
         }
