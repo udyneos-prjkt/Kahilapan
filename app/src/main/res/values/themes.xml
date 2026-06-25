@@ -1,7 +1,5 @@
-<!-- app/src/main/res/values/themes.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Splash Theme - Full Screen -->
     <style name="Theme.Notes.Splash" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
@@ -11,7 +9,6 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
     
-    <!-- Main Theme -->
     <style name="Theme.Notes" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/status_bar_color</item>
         <item name="android:navigationBarColor">@color/main_background</item>
