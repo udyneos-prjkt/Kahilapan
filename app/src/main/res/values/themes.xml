@@ -1,6 +1,12 @@
-<!-- res/values/themes.xml -->
+<!-- app/src/main/res/values/themes.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Notes" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/DarkSurface</item>
+        <!-- Status bar transparan -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        
+        <!-- Ikon status bar -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>
