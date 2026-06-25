@@ -1,4 +1,4 @@
-// NoteScreen.kt
+// app/src/main/java/com/dinsoft/notes/ui/screens/NoteScreen.kt
 package com.dinsoft.notes.ui.screens
 
 import androidx.compose.foundation.layout.*
@@ -12,11 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.data.Note
-import com.dinsoft.notes.ui.components.NoteCard
-import com.dinsoft.notes.ui.components.NoteDialog
+import com.dinsoft.notes.ui.Component.NoteCard
+import com.dinsoft.notes.ui.Component.NoteDialog
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)  // ← TAMBAHKAN INI
 @Composable
 fun NoteScreen(viewModel: NoteViewModel) {
     val notesState by viewModel.notes.collectAsState()
@@ -31,15 +31,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
                 title = { Text("📝 Notes") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
-                ),
-                actions = {
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(Icons.Default.Search, "Search")
-                    }
-                    IconButton(onClick = { /* Settings */ }) {
-                        Icon(Icons.Default.MoreVert, "More")
-                    }
-                }
+                )
             )
         },
         floatingActionButton = {
@@ -80,7 +72,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
         }
     }
     
-    // Note Dialog
     if (showDialog) {
         NoteDialog(
             note = selectedNote,
@@ -92,7 +83,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
-    // Delete Confirmation
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },

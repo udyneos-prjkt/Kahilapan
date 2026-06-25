@@ -1,5 +1,5 @@
-// NoteDialog.kt
-package com.dinsoft.notes.ui.components
+// app/src/main/java/com/dinsoft/notes/ui/Component/NoteDialog.kt
+package com.dinsoft.notes.ui.Component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.data.Note
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)  // ← TAMBAHKAN INI
 @Composable
 fun NoteDialog(
     note: Note?,

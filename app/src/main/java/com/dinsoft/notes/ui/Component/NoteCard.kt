@@ -1,4 +1,4 @@
-// NoteCard.kt
+// app/src/main/java/com/dinsoft/notes/ui/Component/NoteCard.kt
 package com.dinsoft.notes.ui.Component
 
 import androidx.compose.foundation.layout.*
@@ -16,7 +16,7 @@ import com.dinsoft.notes.data.Note
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)  // ← TAMBAHKAN INI
 @Composable
 fun NoteCard(
     note: Note,
