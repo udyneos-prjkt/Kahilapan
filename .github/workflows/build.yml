@@ -37,6 +37,7 @@ jobs:
          
     - name: Build APK
       run: |
+         cat ${{ github.event.inputs.buildType }
          if [ "${{ github.event.inputs.buildType }}" == "debug" ]; then
            ./gradlew assembleDebug
          else
@@ -48,15 +49,20 @@ jobs:
     - name: Upload APK to Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Kahilapan-artifact
-        path: |
-          app/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/release/*.apk
+        name: Kahilapan-files
+        path: app/build/outputs/apk/${{ github.event.inputs.buildType }}/*.apk
     
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          app/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/release/*.apk
-        generate_release_notes: true
+        tag_name: ${{ github.event.inputs.buildType }}
+        body: |
+            ## 📱 Android Build
+            
+            ### Installation:
+            1. Download APK
+            2. Enable "Unknown Sources" in settings
+            3. Install APK
+        files: app/build/outputs/apk/${{ github.event.inputs.buildType }}/*.apk
+        draft: false
+        prerelease: true
