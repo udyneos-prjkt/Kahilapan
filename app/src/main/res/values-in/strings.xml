@@ -1,0 +1,61 @@
+<!-- app/src/main/res/values-in/strings.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kahilapan</string>
+    
+    <!-- Main Screen -->
+    <string name="notes">Catatan</string>
+    <string name="new_note">Catatan Baru</string>
+    <string name="no_notes">Belum ada catatan</string>
+    <string name="tap_create">Ketuk + untuk membuat catatan pertama</string>
+    <string name="search">Cari</string>
+    <string name="delete">Hapus</string>
+    <string name="cancel">Batal</string>
+    <string name="save">Simpan</string>
+    <string name="close">Tutup</string>
+    <string name="confirm_delete">Apakah Anda yakin ingin menghapus catatan ini?</string>
+    <string name="confirm_delete_all">Apakah Anda yakin ingin menghapus SEMUA catatan? Tindakan ini tidak dapat dibatalkan!</string>
+    <string name="delete_note_title">Hapus Catatan</string>
+    <string name="delete_all_title">Hapus Semua Catatan</string>
+    <string name="untitled">Tanpa Judul</string>
+    <string name="title_hint">Judul</string>
+    <string name="content_hint">Tulis catatan Anda...</string>
+    <string name="edit_note">Edit Catatan</string>
+    
+    <!-- Splash -->
+    <string name="splash_tagline">Tulis. Simpan. Ingat.</string>
+    <string name="developed_with">Dikembangkan dengan</string>
+    <string name="by_developer">oleh DinSoft</string>
+    <string name="version">Versi 1.0.0</string>
+    
+    <!-- Backup & Restore -->
+    <string name="backup_restore">Cadangkan &amp; Pulihkan</string>
+    <string name="backup_notes">Cadangkan Catatan</string>
+    <string name="restore_notes">Pulihkan Catatan</string>
+    <string name="backup_success">✅ Pencadangan berhasil!</string>
+    <string name="backup_failed">❌ Pencadangan gagal: %s</string>
+    <string name="restore_success">✅ %d catatan berhasil dipulihkan!</string>
+    <string name="restore_failed">❌ Pemulihan gagal: %s</string>
+    <string name="backup_desc">Simpan semua catatan ke file JSON</string>
+    <string name="restore_warning">⚠️ Pemulihan akan menimpa data yang ada</string>
+    
+    <!-- Attachment Types -->
+    <string name="attach_document">Lampirkan Dokumen</string>
+    <string name="attach_music">Lampirkan Musik</string>
+    <string name="attach_photo">Lampirkan Foto</string>
+    <string name="attach_video">Lampirkan Video</string>
+    <string name="attachment">Lampiran</string>
+    <string name="attachments">Lampiran</string>
+    <string name="no_attachments">Tidak ada lampiran</string>
+    <string name="add_attachment">Tambah Lampiran</string>
+    <string name="remove_attachment">Hapus Lampiran</string>
+    
+    <!-- Settings -->
+    <string name="settings">Pengaturan</string>
+    <string name="language">Bahasa</string>
+    <string name="english">Bahasa Inggris</string>
+    <string name="indonesian">Bahasa Indonesia</string>
+    <string name="theme">Tema</string>
+    <string name="dark_mode">Mode Gelap</string>
+    <string name="light_mode">Mode Terang</string>
+</resources>

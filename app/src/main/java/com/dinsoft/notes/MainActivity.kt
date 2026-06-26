@@ -1,7 +1,6 @@
 // app/src/main/java/com/dinsoft/notes/MainActivity.kt
 package com.dinsoft.notes
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,10 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
 import com.dinsoft.notes.ui.screens.NoteScreen
 import com.dinsoft.notes.ui.screens.SplashScreen
-import com.dinsoft.notes.ui.theme.NotesTheme 
+import com.dinsoft.notes.ui.theme.KahilapanTheme
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
@@ -21,27 +19,13 @@ class MainActivity : ComponentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Atur warna status bar
-        window.statusBarColor = Color.parseColor("#0A0A1A")
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = false
-        }
-        
         setContent {
-            NotesTheme {
+            KahilapanTheme {
                 var showSplash by remember { mutableStateOf(true) }
                 
                 if (showSplash) {
-                    LaunchedEffect(Unit) {
-                        window.statusBarColor = Color.parseColor("#1A1A2E")
-                    }
-                    
                     SplashScreen(
-                        onSplashFinished = {
-                            window.statusBarColor = Color.parseColor("#0A0A1A")
-                            showSplash = false
-                        }
+                        onSplashFinished = { showSplash = false }
                     )
                 } else {
                     Surface(modifier = Modifier.fillMaxSize()) {

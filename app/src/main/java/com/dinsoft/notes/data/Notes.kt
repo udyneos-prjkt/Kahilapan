@@ -1,4 +1,4 @@
-// Note.kt
+// app/src/main/java/com/dinsoft/notes/data/Note.kt
 package com.dinsoft.notes.data
 
 import androidx.room.Entity
