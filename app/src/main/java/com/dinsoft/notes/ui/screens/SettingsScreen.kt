@@ -26,11 +26,12 @@ import com.dinsoft.notes.ui.component.AboutDeveloperDialog
 fun SettingsScreen(
     onBack: () -> Unit,
     onLanguageChange: (String) -> Unit,
-    currentLanguage: String
+    currentLanguage: StateFlow<String>
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val language by currentLanguage.collectAsState()
     
     Scaffold(
         topBar = {

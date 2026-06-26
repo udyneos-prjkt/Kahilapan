@@ -3,6 +3,9 @@ package com.dinsoft.notes.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dinsoft.notes.data.*
@@ -10,23 +13,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class NoteViewModel(application: Application) : AndroidViewModel(application) {
     private val database = NoteDatabase.getDatabase(application)
     private val dao = database.noteDao()
     private val attachmentDao = database.attachmentDao()
     private val backupManager = BackupRestoreManager(application)
-    var currentLanguage by mutableStateOf("en")
-    fun setLanguage(language: String) {
-        currentLanguage = language
-        // Update app locale
-        val context = getApplication<Application>()
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-        val config = android.content.res.Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
-    }
+    
     val notes: StateFlow<List<Note>> = dao.getAllNotes()
         .let { flow ->
             val stateFlow = MutableStateFlow<List<Note>>(emptyList())
@@ -36,6 +30,21 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
             stateFlow.asStateFlow()
         }
     
+    // Language support
+    var currentLanguage by mutableStateOf("en")
+    
+    fun setLanguage(language: String) {
+        currentLanguage = language
+        val context = getApplication<Application>()
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = android.content.res.Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        @Suppress("DEPRECATION")
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+    }
+    
+    // Note functions
     fun saveNote(note: Note) {
         viewModelScope.launch {
             if (note.id == 0) {
@@ -74,6 +83,12 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 stateFlow.asStateFlow()
             }
+    }
+    
+    fun deleteAttachment(attachment: Attachment) {
+        viewModelScope.launch {
+            attachmentDao.deleteAttachment(attachment)
+        }
     }
     
     // Backup functions
