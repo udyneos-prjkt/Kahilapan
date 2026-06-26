@@ -9,7 +9,91 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+
+// Monet Colors
+val md_theme_light_primary = Color(0xFF6750A4)
+val md_theme_light_onPrimary = Color(0xFFFFFFFF)
+val md_theme_light_primaryContainer = Color(0xFFEADDFF)
+val md_theme_light_onPrimaryContainer = Color(0xFF21005D)
+val md_theme_light_secondary = Color(0xFF625B71)
+val md_theme_light_onSecondary = Color(0xFFFFFFFF)
+val md_theme_light_secondaryContainer = Color(0xFFE8DEF8)
+val md_theme_light_onSecondaryContainer = Color(0xFF1D192B)
+val md_theme_light_tertiary = Color(0xFF7D5260)
+val md_theme_light_onTertiary = Color(0xFFFFFFFF)
+val md_theme_light_tertiaryContainer = Color(0xFFFFD8E4)
+val md_theme_light_onTertiaryContainer = Color(0xFF31111D)
+val md_theme_light_error = Color(0xFFB3261E)
+val md_theme_light_background = Color(0xFFFFFBFE)
+val md_theme_light_onBackground = Color(0xFF1C1B1F)
+val md_theme_light_surface = Color(0xFFFFFBFE)
+val md_theme_light_onSurface = Color(0xFF1C1B1F)
+val md_theme_light_surfaceVariant = Color(0xFFE7E0EC)
+val md_theme_light_onSurfaceVariant = Color(0xFF49454F)
+
+val md_theme_dark_primary = Color(0xFFD0BCFF)
+val md_theme_dark_onPrimary = Color(0xFF381E72)
+val md_theme_dark_primaryContainer = Color(0xFF4F378B)
+val md_theme_dark_onPrimaryContainer = Color(0xFFEADDFF)
+val md_theme_dark_secondary = Color(0xFFCCC2DC)
+val md_theme_dark_onSecondary = Color(0xFF332D41)
+val md_theme_dark_secondaryContainer = Color(0xFF4A4458)
+val md_theme_dark_onSecondaryContainer = Color(0xFFE8DEF8)
+val md_theme_dark_tertiary = Color(0xFFEFB8C8)
+val md_theme_dark_onTertiary = Color(0xFF492532)
+val md_theme_dark_tertiaryContainer = Color(0xFF633B48)
+val md_theme_dark_onTertiaryContainer = Color(0xFFFFD8E4)
+val md_theme_dark_error = Color(0xFFF2B8B5)
+val md_theme_dark_background = Color(0xFF1C1B1F)
+val md_theme_dark_onBackground = Color(0xFFE6E1E5)
+val md_theme_dark_surface = Color(0xFF1C1B1F)
+val md_theme_dark_onSurface = Color(0xFFE6E1E5)
+val md_theme_dark_surfaceVariant = Color(0xFF49454F)
+val md_theme_dark_onSurfaceVariant = Color(0xFFCAC4D0)
+
+// Typography dengan nama jelas
+val KahilapanTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp
+    )
+)
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -58,7 +142,7 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun KahilapanTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true, // Monet ON
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -71,19 +155,9 @@ fun KahilapanTheme(
         else -> LightColorScheme
     }
     
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as android.app.Activity).window
-            WindowCompat.getInsetsController(window, view).apply {
-                isAppearanceLightStatusBars = !darkTheme
-            }
-        }
-    }
-    
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = KahilapanTypography,
         content = content
     )
 }
