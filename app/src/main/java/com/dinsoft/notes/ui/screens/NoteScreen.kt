@@ -28,7 +28,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
     var showSettings by remember { mutableStateOf(false) }
     
-    // Attachments untuk note yang dipilih
     val existingAttachments = if (selectedNote != null) {
         viewModel.getAttachmentsForNote(selectedNote!!.id).collectAsState().value
     } else {
@@ -49,7 +48,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    // HANYA TOMBOL SETTINGS
                     IconButton(onClick = { showSettings = true }) {
                         Icon(Icons.Default.Settings, stringResource(R.string.settings))
                     }
@@ -71,9 +69,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
             EmptyState(modifier = Modifier.padding(padding))
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -127,18 +123,12 @@ fun NoteScreen(viewModel: NoteViewModel) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        if (noteToDelete != null) {
-                            viewModel.deleteNote(noteToDelete!!)
-                        } else {
-                            viewModel.deleteAllNotes()
-                        }
+                        if (noteToDelete != null) viewModel.deleteNote(noteToDelete!!)
+                        else viewModel.deleteAllNotes()
                         showDeleteDialog = false
                     }
                 ) {
-                    Text(
-                        stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -149,45 +139,26 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
-    // Settings Screen (Termasuk Backup/Restore)
+    // Settings Screen - PERBAIKI: kirim viewModel langsung, bukan lambda
     if (showSettings) {
         SettingsScreen(
             onBack = { showSettings = false },
             onLanguageChange = { language -> viewModel.setLanguage(language) },
             currentLanguage = viewModel.currentLanguage,
-            onBackupRestore = { viewModel }  // ← Pass viewModel untuk backup/restore
+            onBackupRestore = viewModel  // ← KIRIM viewModel LANGSUNG, bukan { viewModel }
         )
     }
 }
 
 @Composable
 fun EmptyState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                Icons.Default.NoteAdd,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-            )
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Default.NoteAdd, null, modifier = Modifier.size(80.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                stringResource(R.string.no_notes),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Text(stringResource(R.string.no_notes), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                stringResource(R.string.tap_create),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-            )
+            Text(stringResource(R.string.tap_create), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
         }
     }
 }
