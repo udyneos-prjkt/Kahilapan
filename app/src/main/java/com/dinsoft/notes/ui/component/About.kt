@@ -1,4 +1,4 @@
-// app/src/main/java/com/dinsoft/notes/ui/component/AboutDeveloperDialog.kt
+// app/src/main/java/com/dinsoft/notes/ui/component/About.kt
 package com.dinsoft.notes.ui.component
 
 import android.content.Intent
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dinsoft.notes.R
 
+@OptIn(ExperimentalMaterial3Api::class) // ← TAMBAHKAN INI
 @Composable
 fun AboutDeveloperDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
@@ -86,7 +87,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                HorizontalDivider()
+                Divider() // ← GANTI HorizontalDivider ke Divider
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
@@ -161,26 +162,11 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                     )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        InfoRow(
-                            label = stringResource(R.string.app_name),
-                            value = "Kahilapan"
-                        )
-                        InfoRow(
-                            label = stringResource(R.string.version),
-                            value = "1.0.0"
-                        )
-                        InfoRow(
-                            label = "Package",
-                            value = "com.dinsoft.notes"
-                        )
-                        InfoRow(
-                            label = stringResource(R.string.developer),
-                            value = "DinSoft"
-                        )
-                        InfoRow(
-                            label = "©",
-                            value = "2026 Kahilapan. All rights reserved."
-                        )
+                        InfoRow(label = stringResource(R.string.app_name), value = "Kahilapan")
+                        InfoRow(label = stringResource(R.string.version), value = "1.0.0")
+                        InfoRow(label = "Package", value = "com.dinsoft.notes")
+                        InfoRow(label = stringResource(R.string.developer), value = "DinSoft")
+                        InfoRow(label = "©", value = "2026 Kahilapan. All rights reserved.")
                     }
                 }
                 
@@ -210,42 +196,21 @@ fun SocialButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = color
-        )
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = color
-        )
+        Icon(icon, null, modifier = Modifier.size(20.dp), tint = color)
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = label,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Start
-        )
+        Text(text = label, modifier = Modifier.weight(1f), textAlign = TextAlign.Start)
     }
 }
 
 @Composable
 fun InfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium
-        )
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
     }
 }

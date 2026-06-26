@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.R
+import com.dinsoft.notes.ui.component.AboutDeveloperDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,20 +55,15 @@ fun SettingsScreen(
         ) {
             // SECTION: GENERAL
             SettingsSection(title = stringResource(R.string.general)) {
-                // Language
                 SettingsItem(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.language),
-                    subtitle = if (currentLanguage == "en") 
-                        stringResource(R.string.english) 
-                    else 
-                        stringResource(R.string.indonesian),
+                    subtitle = if (currentLanguage == "en") stringResource(R.string.english) else stringResource(R.string.indonesian),
                     onClick = { showLanguageDialog = true }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
                 
-                // Theme (Info only - auto Monet)
                 SettingsItem(
                     icon = Icons.Default.Palette,
                     title = stringResource(R.string.theme),
@@ -79,12 +76,11 @@ fun SettingsScreen(
             
             // SECTION: DATA
             SettingsSection(title = stringResource(R.string.data_storage)) {
-                // Backup
                 SettingsItem(
                     icon = Icons.Default.Backup,
                     title = stringResource(R.string.backup_restore),
                     subtitle = stringResource(R.string.backup_desc),
-                    onClick = { /* Buka BackupDialog dari NoteScreen */ }
+                    onClick = { }
                 )
             }
             
@@ -92,7 +88,6 @@ fun SettingsScreen(
             
             // SECTION: ABOUT
             SettingsSection(title = stringResource(R.string.about)) {
-                // About Developer
                 SettingsItem(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.about_developer),
@@ -100,9 +95,8 @@ fun SettingsScreen(
                     onClick = { showAboutDialog = true }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
                 
-                // Rate App
                 SettingsItem(
                     icon = Icons.Default.Star,
                     title = stringResource(R.string.rate_app),
@@ -115,9 +109,8 @@ fun SettingsScreen(
                     }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
                 
-                // Share App
                 SettingsItem(
                     icon = Icons.Default.Share,
                     title = stringResource(R.string.share_app),
@@ -125,15 +118,14 @@ fun SettingsScreen(
                     onClick = {
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, "Download Kahilapan Notes App: https://play.google.com/store/apps/details?id=com.dinsoft.notes")
+                            putExtra(Intent.EXTRA_TEXT, "Download Kahilapan Notes App!")
                         }
                         context.startActivity(Intent.createChooser(intent, "Share via"))
                     }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
                 
-                // Privacy Policy
                 SettingsItem(
                     icon = Icons.Default.Policy,
                     title = stringResource(R.string.privacy_policy),
@@ -146,11 +138,10 @@ fun SettingsScreen(
                     }
                 )
                 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
                 
-                // Version
                 SettingsItem(
-                    icon = Icons.Default.Settings,
+                    icon = Icons.Default.Info,
                     title = stringResource(R.string.version),
                     subtitle = "1.0.0 (Build 1)",
                     onClick = { }
@@ -164,37 +155,53 @@ fun SettingsScreen(
                 text = "Kahilapan © ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                textAlign = TextAlign.Center
             )
         }
     }
     
     // Language Dialog
     if (showLanguageDialog) {
-        LanguageDialog(
-            currentLanguage = currentLanguage,
-            onLanguageSelected = { language ->
-                onLanguageChange(language)
-                showLanguageDialog = false
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(stringResource(R.string.select_language)) },
+            text = {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable { onLanguageChange("en"); showLanguageDialog = false }.padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = currentLanguage == "en", onClick = { onLanguageChange("en"); showLanguageDialog = false })
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.english))
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable { onLanguageChange("in"); showLanguageDialog = false }.padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = currentLanguage == "in", onClick = { onLanguageChange("in"); showLanguageDialog = false })
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.indonesian))
+                    }
+                }
             },
-            onDismiss = { showLanguageDialog = false }
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.close))
+                }
+            }
         )
     }
     
-    // About Developer Dialog
+    // About Dialog
     if (showAboutDialog) {
         AboutDeveloperDialog(onDismiss = { showAboutDialog = false })
     }
 }
 
 @Composable
-fun SettingsSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
+fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column {
         Text(
             text = title,
@@ -202,14 +209,9 @@ fun SettingsSection(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
-        
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            )
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
         ) {
             Column(content = content)
         }
@@ -224,95 +226,15 @@ fun SettingsItem(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        
+        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.width(16.dp))
-        
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
+            Text(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         }
-        
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            modifier = Modifier.size(20.dp)
-        )
-    }
-}
-
-@Composable
-fun LanguageDialog(
-    currentLanguage: String,
-    onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_language)) },
-        text = {
-            Column {
-                // English
-                RadioButtonRow(
-                    text = stringResource(R.string.english),
-                    selected = currentLanguage == "en",
-                    onClick = { onLanguageSelected("en") }
-                )
-                
-                // Indonesian
-                RadioButtonRow(
-                    text = stringResource(R.string.indonesian),
-                    selected = currentLanguage == "in",
-                    onClick = { onLanguageSelected("in") }
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
-            }
-        }
-    )
-}
-
-@Composable
-fun RadioButtonRow(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyLarge)
+        Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f), modifier = Modifier.size(20.dp))
     }
 }
