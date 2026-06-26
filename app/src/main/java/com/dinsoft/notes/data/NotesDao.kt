@@ -16,7 +16,7 @@ interface NoteDao {
     suspend fun getNoteById(id: Int): Note?
     
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNote(note: Note): Long  // ← Return Long (noteId)
+    suspend fun insertNote(note: Note): Long  // ← HARUS RETURN Long
     
     @Update
     suspend fun updateNote(note: Note)

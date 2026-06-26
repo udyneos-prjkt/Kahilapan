@@ -40,34 +40,29 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         config.setLocale(locale)
         @Suppress("DEPRECATION")
         context.resources.updateConfiguration(config, context.resources.displayMetrics)
-        
-        // Trigger recompose
-        val temp = currentLanguage
-        currentLanguage = ""
-        currentLanguage = language
     }
     
-    // SIMPAN NOTE + ATTACHMENTS (FIX FOREIGN KEY)
+    // SIMPAN NOTE + ATTACHMENTS (FIX: Dapatkan noteId dari insert)
     fun saveNoteWithAttachments(note: Note, attachments: List<Attachment>) {
         viewModelScope.launch {
             var noteId = note.id
             
             if (note.id == 0) {
-                // Insert note baru dan dapatkan ID
+                // Insert note baru dan dapatkan ID yang digenerate
                 noteId = dao.insertNote(note).toInt()
             } else {
-                // Update note
+                // Update note yang sudah ada
                 dao.updateNote(note)
                 // Hapus attachments lama
                 attachmentDao.deleteAttachmentsForNote(note.id)
             }
             
-            // Simpan attachments dengan noteId yang benar
+            // Simpan attachments dengan noteId yang BENAR
             attachments.forEach { attachment ->
                 attachmentDao.insertAttachment(
                     attachment.copy(
-                        id = 0,
-                        noteId = noteId  // ← Gunakan noteId yang benar
+                        id = 0,           // Reset ID
+                        noteId = noteId   // Gunakan noteId dari hasil insert/update
                     )
                 )
             }
@@ -87,7 +82,6 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    // Ambil attachments untuk edit
     fun getAttachmentsForNote(noteId: Int): StateFlow<List<Attachment>> {
         return attachmentDao.getAttachmentsForNote(noteId)
             .let { flow ->

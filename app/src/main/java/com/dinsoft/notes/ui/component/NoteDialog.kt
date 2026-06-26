@@ -18,20 +18,19 @@ import com.dinsoft.notes.R
 import com.dinsoft.notes.data.Attachment
 import com.dinsoft.notes.data.AttachmentType
 import com.dinsoft.notes.data.Note
-import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDialog(
     note: Note?,
     onDismiss: () -> Unit,
-    onSave: (Note, List<Attachment>) -> Unit,  // ← Tambah parameter attachments
-    existingAttachments: List<Attachment> = emptyList()  // ← Attachments yang sudah ada
+    onSave: (Note, List<Attachment>) -> Unit,
+    existingAttachments: List<Attachment> = emptyList()
 ) {
     var title by remember(note) { mutableStateOf(note?.title ?: "") }
     var content by remember(note) { mutableStateOf(note?.content ?: "") }
     var showAttachmentPicker by remember { mutableStateOf(false) }
-    var attachments by remember { mutableStateOf(existingAttachments) }
+    var attachments by remember(note) { mutableStateOf(existingAttachments) }  // ← Inisialisasi dengan existing
     
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -101,7 +100,7 @@ fun NoteDialog(
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = {
-                        if (title.isNotBlank() || content.isNotBlank()) {
+                        if (title.isNotBlank() || content.isNotBlank() || attachments.isNotEmpty()) {
                             val newNote = Note(
                                 id = note?.id ?: 0,
                                 title = title,
@@ -162,12 +161,7 @@ fun AttachmentItem(attachment: Attachment, onRemove: () -> Unit) {
                 }
             }
             IconButton(onClick = onRemove, modifier = Modifier.size(32.dp)) {
-                Icon(
-                    Icons.Default.Close,
-                    stringResource(R.string.remove_attachment),
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
+                Icon(Icons.Default.Close, stringResource(R.string.remove_attachment), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -231,10 +225,15 @@ fun AttachmentPickerDialog(
     )
 }
 
+// Helper functions
 fun createAttachmentFromUri(context: android.content.Context, uri: android.net.Uri, type: AttachmentType): Attachment {
     var fileName = "unknown"
     var mimeType = "unknown"
     var size = 0L
+    
+    // Copy file ke internal storage
+    val savedUri = copyToInternalStorage(context, uri)
+    
     val cursor = context.contentResolver.query(uri, null, null, null, null)
     cursor?.use {
         if (it.moveToFirst()) {
@@ -245,7 +244,38 @@ fun createAttachmentFromUri(context: android.content.Context, uri: android.net.U
         }
     }
     mimeType = context.contentResolver.getType(uri) ?: "unknown"
-    return Attachment(id = 0, noteId = 0, uri = uri.toString(), fileName = fileName, mimeType = mimeType, size = size, type = type)
+    
+    return Attachment(
+        id = 0,
+        noteId = 0,
+        uri = savedUri?.toString() ?: uri.toString(),
+        fileName = fileName,
+        mimeType = mimeType,
+        size = size,
+        type = type
+    )
+}
+
+// Copy file ke internal storage agar tetap ada
+fun copyToInternalStorage(context: android.content.Context, uri: android.net.Uri): android.net.Uri? {
+    try {
+        val dir = java.io.File(context.filesDir, "attachments")
+        if (!dir.exists()) dir.mkdirs()
+        
+        val fileName = "${System.currentTimeMillis()}_${uri.lastPathSegment ?: "file"}"
+        val file = java.io.File(dir, fileName)
+        
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            java.io.FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+        
+        return android.net.Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return null
 }
 
 fun formatFileSize(size: Long): String {

@@ -24,7 +24,7 @@ fun BackupDialog(
 ) {
     // File picker untuk backup (membuat file baru)
     val backupLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/json")
+        contract = ActivityResultContracts.CreateDocument("application/zip")
     ) { uri: Uri? ->
         uri?.let {
             viewModel.backupNotes(it)
@@ -149,7 +149,7 @@ fun BackupDialog(
                         
                         OutlinedButton(
                             onClick = {
-                                restoreLauncher.launch(arrayOf("application/json", "*/*"))
+                                restoreLauncher.launch(arrayOf("application/zip", "*/*"))
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.outlinedButtonColors(

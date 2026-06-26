@@ -212,7 +212,7 @@ class BackupRestoreManager(private val context: Context) {
     
     fun generateBackupFileName(): String {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-        return "Kahilapan_Backup_${dateFormat.format(Date())}.zip"
+        return "Kahilapan_Backup_${dateFormat.format(Date())}"
     }
 }
 
