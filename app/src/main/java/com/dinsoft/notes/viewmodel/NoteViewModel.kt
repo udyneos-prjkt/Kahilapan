@@ -5,18 +5,28 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.dinsoft.notes.data.BackupRestoreManager
-import com.dinsoft.notes.data.Note
-import com.dinsoft.notes.data.NoteDatabase
+import com.dinsoft.notes.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class NoteViewModel(application: Application) : AndroidViewModel(application) {
-    private val dao = NoteDatabase.getDatabase(application).noteDao()
+    private val database = NoteDatabase.getDatabase(application)
+    private val dao = database.noteDao()
+    private val attachmentDao = database.attachmentDao()
     private val backupManager = BackupRestoreManager(application)
-    
+    var currentLanguage by mutableStateOf("en")
+    fun setLanguage(language: String) {
+        currentLanguage = language
+        // Update app locale
+        val context = getApplication<Application>()
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = android.content.res.Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+    }
     val notes: StateFlow<List<Note>> = dao.getAllNotes()
         .let { flow ->
             val stateFlow = MutableStateFlow<List<Note>>(emptyList())
@@ -48,21 +58,37 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    // Fungsi Backup
+    // Attachment functions
+    fun saveAttachment(attachment: Attachment) {
+        viewModelScope.launch {
+            attachmentDao.insertAttachment(attachment)
+        }
+    }
+    
+    fun getAttachmentsForNote(noteId: Int): StateFlow<List<Attachment>> {
+        return attachmentDao.getAttachmentsForNote(noteId)
+            .let { flow ->
+                val stateFlow = MutableStateFlow<List<Attachment>>(emptyList())
+                viewModelScope.launch {
+                    flow.collect { stateFlow.value = it }
+                }
+                stateFlow.asStateFlow()
+            }
+    }
+    
+    // Backup functions
     fun backupNotes(uri: Uri) {
         viewModelScope.launch {
             backupManager.backupNotes(uri)
         }
     }
     
-    // Fungsi Restore
     fun restoreNotes(uri: Uri) {
         viewModelScope.launch {
             backupManager.restoreNotes(uri)
         }
     }
     
-    // Generate nama file backup
     fun getBackupFileName(): String {
         return backupManager.generateBackupFileName()
     }

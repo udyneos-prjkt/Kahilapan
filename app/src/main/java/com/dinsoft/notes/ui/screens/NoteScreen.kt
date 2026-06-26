@@ -28,6 +28,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
     var showBackupDialog by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -49,6 +50,9 @@ fun NoteScreen(viewModel: NoteViewModel) {
                 actions = {
                     IconButton(onClick = { showBackupDialog = true }) {
                         Icon(Icons.Default.Backup, stringResource(R.string.backup_restore))
+                    }
+                    IconButton(onClick = { showSettings = true }) {
+                       Icon(Icons.Default.Settings, stringResource(R.string.settings))
                     }
                 }
             )
@@ -91,7 +95,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
         }
     }
     
-    // Note Dialog
+    // Di dalam NoteScreen.kt, update bagian NoteDialog:
     if (showDialog) {
         NoteDialog(
             note = selectedNote,
@@ -99,10 +103,26 @@ fun NoteScreen(viewModel: NoteViewModel) {
             onSave = { note ->
                 viewModel.saveNote(note)
                 showDialog = false
+            },
+            onAttachmentAdded = { attachment ->
+                // Simpan attachment ke database
+                if (selectedNote != null) {
+                    viewModel.saveAttachment(attachment.copy(noteId = selectedNote!!.id))
+                }
             }
         )
     }
     
+    if (showSettings) {
+        SettingsScreen(
+            onBack = { showSettings = false },
+            onLanguageChange = { language ->
+                // Update locale
+                viewModel.setLanguage(language)
+            },
+            currentLanguage = viewModel.currentLanguage
+        )
+    }
     // Delete Confirmation
     if (showDeleteDialog) {
         AlertDialog(

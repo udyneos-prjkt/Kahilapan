@@ -46,6 +46,22 @@
     <string name="remove_attachment">Hapus Lampiran</string>
     
     <string name="settings">Pengaturan</string>
+    <string name="general">Umum</string>
+    <string name="data_storage">Data &amp; Penyimpanan</string>
+    <string name="about">Tentang</string>
+    <string name="about_developer">Tentang Pengembang</string>
+    <string name="about_developer_desc">Pelajari lebih lanjut tentang pengembang</string>
+    <string name="rate_app">Beri Nilai Aplikasi</string>
+    <string name="rate_app_desc">Beri kami nilai di Google Play Store</string>
+    <string name="share_app">Bagikan Aplikasi</string>
+    <string name="share_app_desc">Bagikan dengan teman</string>
+    <string name="privacy_policy">Kebijakan Privasi</string>
+    <string name="privacy_policy_desc">Baca kebijakan privasi kami</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="back">Kembali</string>
+    <string name="developer">Pengembang</string>
+    <string name="developer_bio">Pengembang mobile yang bersemangat menciptakan aplikasi yang indah dan fungsional. Berdedikasi memberikan pengalaman pengguna terbaik.</string>
+    <string name="connect_with_us">Hubungi Kami</string>
     <string name="language">Bahasa</string>
     <string name="english">Bahasa Inggris</string>
     <string name="indonesian">Bahasa Indonesia</string>
