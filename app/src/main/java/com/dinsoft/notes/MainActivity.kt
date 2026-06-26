@@ -1,4 +1,3 @@
-// app/src/main/java/com/dinsoft/notes/MainActivity.kt
 package com.dinsoft.notes
 
 import android.os.Bundle
@@ -15,31 +14,14 @@ import com.dinsoft.notes.ui.theme.KahilapanTheme
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: NoteViewModel by viewModels()
-    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             KahilapanTheme {
-                var showSplash by remember { mutableStateOf(true) }
-                
-                if (showSplash) {
-                    SplashScreen(
-                        onSplashFinished = { showSplash = false }
-                    )
-                } else {
-                    Surface(modifier = Modifier.fillMaxSize()) {
-                        NoteScreen(viewModel = viewModel)
-                    }
-                }
+                var splash by remember { mutableStateOf(true) }
+                if (splash) SplashScreen { splash = false }
+                else Surface(Modifier.fillMaxSize()) { NoteScreen(viewModel = viewModels<NoteViewModel>().value) }
             }
         }
-    }
-    
-    // Handle back button di MainActivity
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        // Biarkan compose yang handle
-        super.onBackPressed()
     }
 }

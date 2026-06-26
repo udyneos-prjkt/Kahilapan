@@ -1,9 +1,7 @@
-// app/src/main/java/com/dinsoft/notes/ui/screens/NoteScreen.kt
 package com.dinsoft.notes.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,145 +18,36 @@ import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteScreen(viewModel: NoteViewModel) {
-    val notesState by viewModel.notes.collectAsState()
-    var showDialog by remember { mutableStateOf(false) }
-    var selectedNote by remember { mutableStateOf<Note?>(null) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var noteToDelete by remember { mutableStateOf<Note?>(null) }
-    var showSettings by remember { mutableStateOf(false) }
-    
-    val existingAttachments = if (selectedNote != null) {
-        viewModel.getAttachmentsForNote(selectedNote!!.id).collectAsState().value
-    } else {
-        emptyList()
-    }
-    
+fun NoteScreen(vm: NoteViewModel) {
+    val notes by vm.notes.collectAsState()
+    var dialog by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf<Note?>(null) }
+    var settings by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.NoteAlt, null, modifier = Modifier.size(28.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.notes))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                actions = {
-                    IconButton(onClick = { showSettings = true }) {
-                        Icon(Icons.Default.Settings, stringResource(R.string.settings))
-                    }
-                }
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = { IconButton(onClick = { settings = true }) { Icon(Icons.Default.Settings, null) } }
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    selectedNote = null
-                    showDialog = true
-                },
-                icon = { Icon(Icons.Default.Add, null) },
-                text = { Text(stringResource(R.string.new_note)) }
-            )
+            FloatingActionButton(onClick = { selected = null; dialog = true }) { Icon(Icons.Default.Add, null) }
         }
-    ) { padding ->
-        if (notesState.isEmpty()) {
-            EmptyState(modifier = Modifier.padding(padding))
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(notesState, key = { it.id }) { note ->
-                    NoteCard(
-                        note = note,
-                        hasAttachments = false,
-                        onClick = {
-                            selectedNote = note
-                            showDialog = true
-                        },
-                        onDelete = {
-                            noteToDelete = note
-                            showDeleteDialog = true
-                        }
-                    )
-                }
+    ) { pad ->
+        if (notes.isEmpty()) Empty(modifier = Modifier.padding(pad))
+        else LazyColumn(Modifier.padding(pad), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(notes) { note ->
+                NoteCard(note, onClick = { selected = note; dialog = true }, onDelete = { vm.delete(note) })
             }
         }
     }
-    
-    // Note Dialog
-    if (showDialog) {
-        NoteDialog(
-            note = selectedNote,
-            onDismiss = { showDialog = false },
-            onSave = { note, attachments ->
-                viewModel.saveNoteWithAttachments(note, attachments)
-                showDialog = false
-            },
-            existingAttachments = existingAttachments
-        )
-    }
-    
-    // Delete Confirmation
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = {
-                Text(
-                    if (noteToDelete != null) stringResource(R.string.delete_note_title)
-                    else stringResource(R.string.delete_all_title)
-                )
-            },
-            text = {
-                Text(
-                    if (noteToDelete != null) stringResource(R.string.confirm_delete)
-                    else stringResource(R.string.confirm_delete_all)
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (noteToDelete != null) viewModel.deleteNote(noteToDelete!!)
-                        else viewModel.deleteAllNotes()
-                        showDeleteDialog = false
-                    }
-                ) {
-                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-    
-    // Settings Screen - PERBAIKI: kirim viewModel langsung, bukan lambda
-    if (showSettings) {
-        SettingsScreen(
-            onBack = { showSettings = false },
-            onLanguageChange = { language -> viewModel.setLanguage(language) },
-            currentLanguage = viewModel.currentLanguage,
-            onBackupRestore = viewModel  // ← KIRIM viewModel LANGSUNG, bukan { viewModel }
-        )
-    }
+
+    if (dialog) NoteDialog(selected, onDismiss = { dialog = false }, onSave = { n, a -> vm.save(n, a); dialog = false })
+    if (settings) SettingsScreen(onBack = { settings = false }, vm = vm)
 }
 
 @Composable
-fun EmptyState(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Default.NoteAdd, null, modifier = Modifier.size(80.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(stringResource(R.string.no_notes), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(stringResource(R.string.tap_create), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-        }
-    }
+fun Empty(modifier: Modifier) = Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text(stringResource(R.string.no_notes), style = MaterialTheme.typography.headlineSmall)
 }
