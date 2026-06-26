@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.dinsoft.notes.R
 import com.dinsoft.notes.data.Note
 import com.dinsoft.notes.ui.component.BackupDialog
 import com.dinsoft.notes.ui.component.NoteCard
@@ -30,7 +32,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.NoteAlt,
@@ -38,16 +40,15 @@ fun NoteScreen(viewModel: NoteViewModel) {
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Notes")
+                        Text(stringResource(R.string.notes))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    // Backup Button
                     IconButton(onClick = { showBackupDialog = true }) {
-                        Icon(Icons.Default.Backup, "Backup & Restore")
+                        Icon(Icons.Default.Backup, stringResource(R.string.backup_restore))
                     }
                 }
             )
@@ -58,8 +59,8 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     selectedNote = null
                     showDialog = true
                 },
-                icon = { Icon(Icons.Default.Add, "Add") },
-                text = { Text("New Note") }
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.new_note)) }
             )
         }
     ) { padding ->
@@ -106,15 +107,16 @@ fun NoteScreen(viewModel: NoteViewModel) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { 
-                Text(if (noteToDelete != null) "Delete Note" else "Delete All Notes") 
-            },
-            text = { 
+            title = {
                 Text(
-                    if (noteToDelete != null) 
-                        "Are you sure you want to delete this note?" 
-                    else 
-                        "Are you sure you want to delete ALL notes?"
+                    if (noteToDelete != null) stringResource(R.string.delete_note_title)
+                    else stringResource(R.string.delete_all_title)
+                )
+            },
+            text = {
+                Text(
+                    if (noteToDelete != null) stringResource(R.string.confirm_delete)
+                    else stringResource(R.string.confirm_delete_all)
                 )
             },
             confirmButton = {
@@ -128,12 +130,15 @@ fun NoteScreen(viewModel: NoteViewModel) {
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(R.string.delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -166,13 +171,13 @@ fun EmptyState(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "No notes yet",
+                stringResource(R.string.no_notes),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Tap + to create your first note",
+                stringResource(R.string.tap_create),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )

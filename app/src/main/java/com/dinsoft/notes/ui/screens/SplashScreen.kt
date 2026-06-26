@@ -18,11 +18,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.dinsoft.notes.R
 import kotlinx.coroutines.delay
 import java.util.Calendar
 
@@ -32,30 +36,29 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val view = LocalView.current
     
-    // Mengatur status bar transparan untuk splash screen
+    // Full Screen
     LaunchedEffect(Unit) {
         val window = (view.context as Activity).window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
-        WindowCompat.getInsetsController(window, view).apply {
-            isAppearanceLightStatusBars = false // Ikon putih
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        insetsController.apply {
+            hide(WindowInsetsCompat.Type.statusBars())
+            hide(WindowInsetsCompat.Type.navigationBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+        
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
     
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 2000,
-            easing = FastOutSlowInEasing
-        )
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
     )
     
     val scaleAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.5f,
-        animationSpec = tween(
-            durationMillis = 800,
-            easing = FastOutSlowInEasing
-        )
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
     )
     
     LaunchedEffect(Unit) {
@@ -82,10 +85,10 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo Animation
+            // Logo
             Surface(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .scale(scaleAnim.value)
                     .alpha(alphaAnim.value),
                 shape = MaterialTheme.shapes.extraLarge,
@@ -95,8 +98,8 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.NoteAlt,
-                        contentDescription = "Notes Logo",
-                        modifier = Modifier.size(35.dp),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(64.dp),
                         tint = Color.White
                     )
                 }
@@ -106,10 +109,10 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             
             // App Name
             Text(
-                text = "Kahilapan",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 36.sp
                 ),
                 color = Color.White,
                 modifier = Modifier.alpha(alphaAnim.value)
@@ -119,7 +122,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             
             // Tagline
             Text(
-                text = "Khususon nu pohoan.",
+                text = stringResource(R.string.splash_tagline),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White.copy(alpha = 0.7f),
                 modifier = Modifier.alpha(alphaAnim.value)
@@ -127,17 +130,17 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             
             Spacer(modifier = Modifier.height(48.dp))
             
-            // Loading Indicator
+            // Loading
             CircularProgressIndicator(
                 modifier = Modifier
-                    .size(22.dp)
+                    .size(32.dp)
                     .alpha(alphaAnim.value),
                 color = Color(0xFFE94560),
                 strokeWidth = 3.dp
             )
         }
         
-        // FOOTER COPYRIGHT
+        // Footer Copyright
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -155,7 +158,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             Spacer(modifier = Modifier.height(12.dp))
             
             Text(
-                text = "© $currentYear Notes App",
+                text = "© $currentYear ${stringResource(R.string.app_name)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
@@ -168,7 +171,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Developed with ",
+                    text = "${stringResource(R.string.developed_with)} ",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.6f)
                 )
@@ -179,7 +182,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                     tint = Color(0xFFE94560)
                 )
                 Text(
-                    text = " by DinSoft",
+                    text = " ${stringResource(R.string.by_developer)}",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -190,7 +193,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             
             Text(
-                text = "Version 1.0.0",
+                text = stringResource(R.string.version),
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center

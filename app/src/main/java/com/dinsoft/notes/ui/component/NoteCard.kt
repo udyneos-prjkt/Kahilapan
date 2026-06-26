@@ -1,4 +1,4 @@
-// app/src/main/java/com/dinsoft/notes/ui/Component/NoteCard.kt
+// app/src/main/java/com/dinsoft/notes/ui/component/NoteCard.kt
 package com.dinsoft.notes.ui.component
 
 import androidx.compose.foundation.layout.*
@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.dinsoft.notes.R
 import com.dinsoft.notes.data.Note
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,7 +44,7 @@ fun NoteCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = note.title.ifEmpty { "Untitled" },
+                    text = note.title.ifEmpty { stringResource(R.string.untitled) },
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f),
                     maxLines = 1,
@@ -54,7 +56,7 @@ fun NoteCard(
                 ) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Delete note",
+                        contentDescription = stringResource(R.string.delete),
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
                     )

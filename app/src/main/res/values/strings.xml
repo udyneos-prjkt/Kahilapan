@@ -34,7 +34,11 @@
     <string name="restore_failed">❌ Restore failed: %s</string>
     <string name="backup_desc">Save all notes to JSON file</string>
     <string name="restore_warning">⚠️ Restoring will overwrite existing data</string>
-    
+    <string name="backup_section">Backup</string>
+    <string name="restore_section">Restore</string>
+    <string name="backup_button">Backup Now</string>
+    <string name="restore_button">Restore from File</string>
+
     <string name="attach_document">Attach Document</string>
     <string name="attach_music">Attach Music</string>
     <string name="attach_photo">Attach Photo</string>

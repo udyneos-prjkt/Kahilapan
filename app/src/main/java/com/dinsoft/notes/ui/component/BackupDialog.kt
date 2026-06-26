@@ -11,7 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dinsoft.notes.R
 import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @Composable
@@ -19,7 +22,7 @@ fun BackupDialog(
     viewModel: NoteViewModel,
     onDismiss: () -> Unit
 ) {
-    // File picker untuk backup (create)
+    // File picker untuk backup (membuat file baru)
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri: Uri? ->
@@ -29,7 +32,7 @@ fun BackupDialog(
         }
     }
     
-    // File picker untuk restore (open)
+    // File picker untuk restore (membuka file)
     val restoreLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -41,71 +44,131 @@ fun BackupDialog(
     
     AlertDialog(
         onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Backup,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Backup, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Backup & Restore")
-            }
+            Text(
+                text = stringResource(R.string.backup_restore),
+                style = MaterialTheme.typography.headlineSmall
+            )
         },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Tombol Backup
-                OutlinedButton(
-                    onClick = {
-                        backupLauncher.launch(viewModel.getBackupFileName())
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.CloudUpload, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Backup Notes")
-                }
-                
-                Text(
-                    text = "Simpan semua catatan ke file JSON",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // GANTI HorizontalDivider dengan Divider
-                Divider(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Tombol Restore
-                OutlinedButton(
-                    onClick = {
-                        restoreLauncher.launch(arrayOf("application/json", "*/*"))
-                    },
+                // SECTION BACKUP
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     )
                 ) {
-                    Icon(Icons.Default.CloudDownload, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Restore Notes")
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.CloudUpload,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.backup_notes),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = stringResource(R.string.backup_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        Button(
+                            onClick = {
+                                backupLauncher.launch(viewModel.getBackupFileName())
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(Icons.Default.SaveAlt, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.backup_notes))
+                        }
+                    }
                 }
                 
-                Text(
-                    text = "⚠️ Mengembalikan catatan akan menimpa data yang ada",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                )
+                // SECTION RESTORE
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.CloudDownload,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.restore_notes),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = stringResource(R.string.restore_warning),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        OutlinedButton(
+                            onClick = {
+                                restoreLauncher.launch(arrayOf("application/json", "*/*"))
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Icon(Icons.Default.FileOpen, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.restore_notes))
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.close))
             }
-        }
+        },
+        dismissButton = null
     )
 }
