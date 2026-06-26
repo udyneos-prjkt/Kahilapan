@@ -73,4 +73,10 @@
     <string name="backup_zip">Cadangkan sebagai ZIP</string>
     <string name="restore_zip">Pulihkan dari ZIP</string>
     <string name="encrypted">Terenskripsi</string>
+        
+    <string name="note_saved">✅ Catatan berhasil disimpan!</string>
+    <string name="note_deleted">🗑️ Catatan dihapus!</string>
+    <string name="attachment_added">📎 Lampiran ditambahkan!</string>
+    <string name="storage_permission_required">Izin penyimpanan diperlukan untuk menyimpan lampiran</string>
+    
 </resources>
