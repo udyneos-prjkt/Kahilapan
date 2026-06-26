@@ -60,7 +60,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                 
                 // Developer Name
                 Text(
-                    text = "DinSoft",
+                    text = "mnrdnn",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -69,7 +69,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                 
                 // Tagline
                 Text(
-                    text = "Mobile & Web Developer",
+                    text = "App Developer",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -107,7 +107,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                     color = Color(0xFF333333),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://github.com/dinsoft")
+                            data = Uri.parse("https://github.com/UdyneO2")
                         }
                         context.startActivity(intent)
                     }
@@ -120,7 +120,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                     color = Color(0xFFEA4335),
                     onClick = {
                         val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:dinsoft@example.com")
+                            data = Uri.parse("mailto:udyneos@gmail.com")
                         }
                         context.startActivity(intent)
                     }
@@ -133,7 +133,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                     color = Color(0xFF4285F4),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://dinsoft.com")
+                            data = Uri.parse("https://udyneos.my.id")
                         }
                         context.startActivity(intent)
                     }
@@ -146,7 +146,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                     color = Color(0xFF0088CC),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://t.me/dinsoft")
+                            data = Uri.parse("https://t.me/mnrdnn")
                         }
                         context.startActivity(intent)
                     }
@@ -163,7 +163,7 @@ fun AboutDeveloperDialog(onDismiss: () -> Unit) {
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         InfoRow(label = stringResource(R.string.app_name), value = "Kahilapan")
-                        InfoRow(label = stringResource(R.string.version), value = "1.0.0")
+                        InfoRow(label = stringResource(R.string.version), value = "2.0.0")
                         InfoRow(label = "Package", value = "com.dinsoft.notes")
                         InfoRow(label = stringResource(R.string.developer), value = "DinSoft")
                         InfoRow(label = "©", value = "2026 Kahilapan. All rights reserved.")

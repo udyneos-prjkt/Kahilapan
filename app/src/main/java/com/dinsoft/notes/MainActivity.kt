@@ -35,4 +35,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    
+    // Handle back button di MainActivity
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        // Biarkan compose yang handle
+        super.onBackPressed()
+    }
 }

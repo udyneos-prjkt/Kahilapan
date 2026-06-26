@@ -68,4 +68,9 @@
     <string name="theme">Tema</string>
     <string name="dark_mode">Mode Gelap</string>
     <string name="light_mode">Mode Terang</string>
+    
+    <string name="has_attachment">Ada lampiran</string>
+    <string name="backup_zip">Cadangkan sebagai ZIP</string>
+    <string name="restore_zip">Pulihkan dari ZIP</string>
+    <string name="encrypted">Terenskripsi</string>
 </resources>

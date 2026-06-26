@@ -3,6 +3,7 @@ package com.dinsoft.notes.data
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import android.widget.Toast
 import com.dinsoft.notes.R
 import com.google.gson.Gson
@@ -15,14 +16,17 @@ import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 
 class BackupRestoreManager(private val context: Context) {
     
     private val gson = Gson()
     private val dao = NoteDatabase.getDatabase(context).noteDao()
     private val attachmentDao = NoteDatabase.getDatabase(context).attachmentDao()
+    private val secretKey = "Kahilapan2026Key" // 16 bytes for AES
     
-    // Backup sebagai ZIP (JSON + files)
+    // Backup sebagai ZIP dengan JSON terenkripsi Base64
     suspend fun backupNotes(uri: Uri): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -31,30 +35,37 @@ class BackupRestoreManager(private val context: Context) {
                 
                 notes.forEach { note ->
                     val attachments = attachmentDao.getAttachmentsForNoteOnce(note.id)
-                    backupData.add(BackupNote(note = note, attachments = attachments))
+                    // Konversi URI ke path relatif
+                    val updatedAttachments = attachments.map { att ->
+                        att.copy(uri = extractFileName(att.uri))
+                    }
+                    backupData.add(BackupNote(note = note, attachments = updatedAttachments))
                 }
                 
-                // Buat ZIP
                 context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     ZipOutputStream(BufferedOutputStream(outputStream)).use { zipOut ->
-                        // 1. Masukkan JSON metadata
+                        
+                        // 1. JSON metadata (Encrypted Base64)
                         zipOut.putNextEntry(ZipEntry("notes.json"))
                         val json = gson.toJson(backupData)
-                        zipOut.write(json.toByteArray())
+                        val encryptedJson = encryptBase64(json)  // ← Encrypt
+                        zipOut.write(encryptedJson.toByteArray())
                         zipOut.closeEntry()
                         
-                        // 2. Masukkan file attachments
-                        backupData.forEach { backupNote ->
-                            backupNote.attachments?.forEach { attachment ->
+                        // 2. File attachments
+                        notes.forEach { note ->
+                            val attachments = attachmentDao.getAttachmentsForNoteOnce(note.id)
+                            attachments.forEach { attachment ->
                                 try {
                                     val attachmentUri = Uri.parse(attachment.uri)
-                                    val inputStream = context.contentResolver.openInputStream(attachmentUri)
-                                    inputStream?.use { input ->
-                                        zipOut.putNextEntry(
-                                            ZipEntry("attachments/${attachment.fileName}")
-                                        )
-                                        input.copyTo(zipOut)
-                                        zipOut.closeEntry()
+                                    // Hanya backup jika file ada di internal storage
+                                    if (attachment.uri.startsWith("file://") || attachment.uri.startsWith("/")) {
+                                        val file = File(attachmentUri.path ?: return@forEach)
+                                        if (file.exists()) {
+                                            zipOut.putNextEntry(ZipEntry("attachments/${attachment.fileName}"))
+                                            file.inputStream().use { it.copyTo(zipOut) }
+                                            zipOut.closeEntry()
+                                        }
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -87,13 +98,13 @@ class BackupRestoreManager(private val context: Context) {
                 var jsonData: String? = null
                 val attachmentFiles = mutableMapOf<String, ByteArray>()
                 
-                // Baca ZIP
                 ZipInputStream(BufferedInputStream(inputStream)).use { zipIn ->
                     var entry = zipIn.nextEntry
                     while (entry != null) {
                         when {
                             entry.name == "notes.json" -> {
-                                jsonData = zipIn.bufferedReader().readText()
+                                val encryptedJson = zipIn.bufferedReader().readText()
+                                jsonData = decryptBase64(encryptedJson)  // ← Decrypt
                             }
                             entry.name.startsWith("attachments/") -> {
                                 val fileName = entry.name.removePrefix("attachments/")
@@ -114,24 +125,22 @@ class BackupRestoreManager(private val context: Context) {
                     
                     // Restore notes
                     backupData.forEach { backupNote ->
-                        val note = backupNote.note.copy(
-                            id = 0,
-                            timestamp = System.currentTimeMillis()
-                        )
-                        dao.insertNote(note)
+                        val note = backupNote.note.copy(id = 0, timestamp = System.currentTimeMillis())
+                        val noteId = dao.insertNote(note).toInt()
                         
                         // Restore attachments
                         backupNote.attachments?.forEach { attachment ->
-                            // Simpan file ke internal storage
                             val savedUri = saveAttachmentFile(attachment.fileName, attachmentFiles[attachment.fileName])
                             
-                            attachmentDao.insertAttachment(
-                                attachment.copy(
-                                    id = 0,
-                                    noteId = note.id,
-                                    uri = savedUri?.toString() ?: attachment.uri
+                            if (savedUri != null) {
+                                attachmentDao.insertAttachment(
+                                    attachment.copy(
+                                        id = 0,
+                                        noteId = noteId,
+                                        uri = savedUri.toString()
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                     
@@ -155,13 +164,12 @@ class BackupRestoreManager(private val context: Context) {
         }
     }
     
-    // Simpan file attachment ke internal storage
     private fun saveAttachmentFile(fileName: String, data: ByteArray?): Uri? {
         if (data == null) return null
-        
         try {
-            val file = File(context.filesDir, "attachments/$fileName")
-            file.parentFile?.mkdirs()
+            val dir = File(context.filesDir, "attachments")
+            if (!dir.exists()) dir.mkdirs()
+            val file = File(dir, fileName)
             file.writeBytes(data)
             return Uri.fromFile(file)
         } catch (e: Exception) {
@@ -170,9 +178,41 @@ class BackupRestoreManager(private val context: Context) {
         return null
     }
     
+    // Encrypt Base64
+    private fun encryptBase64(text: String): String {
+        return try {
+            val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+            val keySpec = SecretKeySpec(secretKey.toByteArray(), "AES")
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec)
+            val encrypted = cipher.doFinal(text.toByteArray())
+            Base64.encodeToString(encrypted, Base64.NO_WRAP)
+        } catch (e: Exception) {
+            // Fallback: plain base64
+            Base64.encodeToString(text.toByteArray(), Base64.NO_WRAP)
+        }
+    }
+    
+    // Decrypt Base64
+    private fun decryptBase64(encryptedText: String): String {
+        return try {
+            val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+            val keySpec = SecretKeySpec(secretKey.toByteArray(), "AES")
+            cipher.init(Cipher.DECRYPT_MODE, keySpec)
+            val decoded = Base64.decode(encryptedText, Base64.NO_WRAP)
+            String(cipher.doFinal(decoded))
+        } catch (e: Exception) {
+            // Fallback: plain base64 decode
+            String(Base64.decode(encryptedText, Base64.NO_WRAP))
+        }
+    }
+    
+    private fun extractFileName(uri: String): String {
+        return uri.substringAfterLast("/")
+    }
+    
     fun generateBackupFileName(): String {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-        return "Kahilapan_Backup_${dateFormat.format(Date())}.zip"  // ← ZIP extension
+        return "Kahilapan_Backup_${dateFormat.format(Date())}.zip"
     }
 }
 

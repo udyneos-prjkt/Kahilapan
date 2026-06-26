@@ -3,6 +3,7 @@ package com.dinsoft.notes.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,17 +21,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.R
 import com.dinsoft.notes.ui.component.AboutDeveloperDialog
+import com.dinsoft.notes.ui.component.BackupDialog
+import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     onLanguageChange: (String) -> Unit,
-    currentLanguage: String  // ← Opsi B: String biasa
+    currentLanguage: String,
+    onBackupRestore: NoteViewModel  // ← ViewModel untuk backup/restore
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showBackupDialog by remember { mutableStateOf(false) }  // ← State untuk backup dialog
     val context = LocalContext.current
+    
+    // Handle back gesture
+    BackHandler { onBack() }
     
     Scaffold(
         topBar = {
@@ -55,6 +63,7 @@ fun SettingsScreen(
         ) {
             // SECTION: GENERAL
             SettingsSection(title = stringResource(R.string.general)) {
+                // Language
                 SettingsItem(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.language),
@@ -65,6 +74,7 @@ fun SettingsScreen(
                 
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
+                // Theme
                 SettingsItem(
                     icon = Icons.Default.Palette,
                     title = stringResource(R.string.theme),
@@ -77,11 +87,12 @@ fun SettingsScreen(
             
             // SECTION: DATA
             SettingsSection(title = stringResource(R.string.data_storage)) {
+                // Backup & Restore
                 SettingsItem(
                     icon = Icons.Default.Backup,
                     title = stringResource(R.string.backup_restore),
                     subtitle = stringResource(R.string.backup_desc),
-                    onClick = { }
+                    onClick = { showBackupDialog = true }  // ← Buka dialog backup
                 )
             }
             
@@ -89,6 +100,7 @@ fun SettingsScreen(
             
             // SECTION: ABOUT
             SettingsSection(title = stringResource(R.string.about)) {
+                // About Developer
                 SettingsItem(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.about_developer),
@@ -98,6 +110,7 @@ fun SettingsScreen(
                 
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
+                // Rate App
                 SettingsItem(
                     icon = Icons.Default.Star,
                     title = stringResource(R.string.rate_app),
@@ -112,6 +125,7 @@ fun SettingsScreen(
                 
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
+                // Share App
                 SettingsItem(
                     icon = Icons.Default.Share,
                     title = stringResource(R.string.share_app),
@@ -127,6 +141,7 @@ fun SettingsScreen(
                 
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
+                // Privacy Policy
                 SettingsItem(
                     icon = Icons.Default.Policy,
                     title = stringResource(R.string.privacy_policy),
@@ -141,6 +156,7 @@ fun SettingsScreen(
                 
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
+                // Version
                 SettingsItem(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.version),
@@ -211,6 +227,14 @@ fun SettingsScreen(
     if (showAboutDialog) {
         AboutDeveloperDialog(onDismiss = { showAboutDialog = false })
     }
+    
+    // BACKUP DIALOG - Dari Settings
+    if (showBackupDialog) {
+        BackupDialog(
+            viewModel = onBackupRestore,
+            onDismiss = { showBackupDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -224,7 +248,9 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
         )
         Card(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
         ) {
             Column(content = content)
         }

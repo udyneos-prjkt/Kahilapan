@@ -9,7 +9,6 @@ interface NoteDao {
     @Query("SELECT * FROM notes ORDER BY timestamp DESC")
     fun getAllNotes(): Flow<List<Note>>
     
-    // Untuk backup
     @Query("SELECT * FROM notes ORDER BY timestamp DESC")
     suspend fun getAllNotesOnce(): List<Note>
     
@@ -17,7 +16,7 @@ interface NoteDao {
     suspend fun getNoteById(id: Int): Note?
     
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNote(note: Note)
+    suspend fun insertNote(note: Note): Long  // ← Return Long (noteId)
     
     @Update
     suspend fun updateNote(note: Note)

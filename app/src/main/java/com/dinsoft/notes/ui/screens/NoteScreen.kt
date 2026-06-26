@@ -14,7 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.R
 import com.dinsoft.notes.data.Note
-import com.dinsoft.notes.ui.component.BackupDialog
 import com.dinsoft.notes.ui.component.NoteCard
 import com.dinsoft.notes.ui.component.NoteDialog
 import com.dinsoft.notes.viewmodel.NoteViewModel
@@ -27,19 +26,21 @@ fun NoteScreen(viewModel: NoteViewModel) {
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
-    var showBackupDialog by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    
+    // Attachments untuk note yang dipilih
+    val existingAttachments = if (selectedNote != null) {
+        viewModel.getAttachmentsForNote(selectedNote!!.id).collectAsState().value
+    } else {
+        emptyList()
+    }
     
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.NoteAlt,
-                            contentDescription = null,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        Icon(Icons.Default.NoteAlt, null, modifier = Modifier.size(28.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.notes))
                     }
@@ -48,11 +49,9 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 actions = {
-                    IconButton(onClick = { showBackupDialog = true }) {
-                        Icon(Icons.Default.Backup, stringResource(R.string.backup_restore))
-                    }
+                    // HANYA TOMBOL SETTINGS
                     IconButton(onClick = { showSettings = true }) {
-                       Icon(Icons.Default.Settings, stringResource(R.string.settings))
+                        Icon(Icons.Default.Settings, stringResource(R.string.settings))
                     }
                 }
             )
@@ -63,7 +62,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     selectedNote = null
                     showDialog = true
                 },
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                icon = { Icon(Icons.Default.Add, null) },
                 text = { Text(stringResource(R.string.new_note)) }
             )
         }
@@ -81,6 +80,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
                 items(notesState, key = { it.id }) { note ->
                     NoteCard(
                         note = note,
+                        hasAttachments = false,
                         onClick = {
                             selectedNote = note
                             showDialog = true
@@ -94,17 +94,9 @@ fun NoteScreen(viewModel: NoteViewModel) {
             }
         }
     }
-    // Di NoteScreen.kt, update bagian NoteDialog:
+    
+    // Note Dialog
     if (showDialog) {
-        val existingAttachments = remember(selectedNote) {
-            if (selectedNote != null) {
-                // Ambil attachments yang sudah ada
-                viewModel.getAttachmentsForNoteOnce(selectedNote!!.id)
-            } else {
-                emptyList()
-            }
-        }
-        
         NoteDialog(
             note = selectedNote,
             onDismiss = { showDialog = false },
@@ -116,16 +108,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
-   
-    if (showSettings) {
-        SettingsScreen(
-            onBack = { showSettings = false },
-            onLanguageChange = { language ->
-                viewModel.setLanguage(language)
-            },
-            currentLanguage = viewModel.currentLanguage  // ← Langsung String, tidak pakai .value
-        )
-    }
     // Delete Confirmation
     if (showDeleteDialog) {
         AlertDialog(
@@ -167,11 +149,13 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
-    // Backup Dialog
-    if (showBackupDialog) {
-        BackupDialog(
-            viewModel = viewModel,
-            onDismiss = { showBackupDialog = false }
+    // Settings Screen (Termasuk Backup/Restore)
+    if (showSettings) {
+        SettingsScreen(
+            onBack = { showSettings = false },
+            onLanguageChange = { language -> viewModel.setLanguage(language) },
+            currentLanguage = viewModel.currentLanguage,
+            onBackupRestore = { viewModel }  // ← Pass viewModel untuk backup/restore
         )
     }
 }

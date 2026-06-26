@@ -40,15 +40,23 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         config.setLocale(locale)
         @Suppress("DEPRECATION")
         context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        
+        // Trigger recompose
+        val temp = currentLanguage
+        currentLanguage = ""
+        currentLanguage = language
     }
     
-    // Save note dengan attachments
+    // SIMPAN NOTE + ATTACHMENTS (FIX FOREIGN KEY)
     fun saveNoteWithAttachments(note: Note, attachments: List<Attachment>) {
         viewModelScope.launch {
-            // Simpan note dulu
+            var noteId = note.id
+            
             if (note.id == 0) {
-                dao.insertNote(note)
+                // Insert note baru dan dapatkan ID
+                noteId = dao.insertNote(note).toInt()
             } else {
+                // Update note
                 dao.updateNote(note)
                 // Hapus attachments lama
                 attachmentDao.deleteAttachmentsForNote(note.id)
@@ -57,7 +65,10 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
             // Simpan attachments dengan noteId yang benar
             attachments.forEach { attachment ->
                 attachmentDao.insertAttachment(
-                    attachment.copy(noteId = note.id)
+                    attachment.copy(
+                        id = 0,
+                        noteId = noteId  // ← Gunakan noteId yang benar
+                    )
                 )
             }
         }
@@ -76,13 +87,14 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    fun getAttachmentsForNoteOnce(noteId: Int): List<Attachment> {
-        // Untuk mengambil attachments saat edit
-        var result = emptyList<Attachment>()
-        viewModelScope.launch {
-            result = attachmentDao.getAttachmentsForNoteOnce(noteId)
-        }
-        return result
+    // Ambil attachments untuk edit
+    fun getAttachmentsForNote(noteId: Int): StateFlow<List<Attachment>> {
+        return attachmentDao.getAttachmentsForNote(noteId)
+            .let { flow ->
+                val stateFlow = MutableStateFlow<List<Attachment>>(emptyList())
+                viewModelScope.launch { flow.collect { stateFlow.value = it } }
+                stateFlow.asStateFlow()
+            }
     }
     
     fun backupNotes(uri: Uri) {

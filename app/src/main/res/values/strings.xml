@@ -73,4 +73,9 @@
     <string name="developer">Developer</string>
     <string name="developer_bio">Passionate mobile developer creating beautiful and functional apps. Dedicated to providing the best user experience.</string>
     <string name="connect_with_us">Connect With Us</string>
+    
+    <string name="has_attachment">Has attachment</string>
+    <string name="backup_zip">Backup as ZIP</string>
+    <string name="restore_zip">Restore from ZIP</string>
+    <string name="encrypted">Encrypted</string>
 </resources>
