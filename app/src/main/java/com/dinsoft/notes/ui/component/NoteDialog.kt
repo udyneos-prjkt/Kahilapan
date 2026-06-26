@@ -18,19 +18,20 @@ import com.dinsoft.notes.R
 import com.dinsoft.notes.data.Attachment
 import com.dinsoft.notes.data.AttachmentType
 import com.dinsoft.notes.data.Note
+import com.dinsoft.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDialog(
     note: Note?,
     onDismiss: () -> Unit,
-    onSave: (Note) -> Unit,
-    onAttachmentAdded: ((Attachment) -> Unit)? = null
+    onSave: (Note, List<Attachment>) -> Unit,  // ← Tambah parameter attachments
+    existingAttachments: List<Attachment> = emptyList()  // ← Attachments yang sudah ada
 ) {
     var title by remember(note) { mutableStateOf(note?.title ?: "") }
     var content by remember(note) { mutableStateOf(note?.content ?: "") }
     var showAttachmentPicker by remember { mutableStateOf(false) }
-    var attachments by remember { mutableStateOf<List<Attachment>>(emptyList()) }
+    var attachments by remember { mutableStateOf(existingAttachments) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -42,7 +43,8 @@ fun NoteDialog(
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = if (note == null) stringResource(R.string.new_note) else stringResource(R.string.edit_note),
+                    text = if (note == null) stringResource(R.string.new_note) 
+                           else stringResource(R.string.edit_note),
                     style = MaterialTheme.typography.headlineSmall
                 )
                 
@@ -86,7 +88,10 @@ fun NoteDialog(
                 if (attachments.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     attachments.forEach { attachment ->
-                        AttachmentItem(attachment = attachment, onRemove = { attachments = attachments - attachment })
+                        AttachmentItem(
+                            attachment = attachment,
+                            onRemove = { attachments = attachments - attachment }
+                        )
                     }
                 }
                 
@@ -97,7 +102,13 @@ fun NoteDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = {
                         if (title.isNotBlank() || content.isNotBlank()) {
-                            onSave(Note(id = note?.id ?: 0, title = title, content = content, timestamp = System.currentTimeMillis()))
+                            val newNote = Note(
+                                id = note?.id ?: 0,
+                                title = title,
+                                content = content,
+                                timestamp = System.currentTimeMillis()
+                            )
+                            onSave(newNote, attachments)  // ← Kirim note + attachments
                         }
                     }) { Text(stringResource(R.string.save)) }
                 }
@@ -111,7 +122,6 @@ fun NoteDialog(
             onDismiss = { showAttachmentPicker = false },
             onFileSelected = { attachment ->
                 attachments = attachments + attachment
-                onAttachmentAdded?.invoke(attachment)
                 showAttachmentPicker = false
             }
         )
@@ -124,7 +134,11 @@ fun AttachmentItem(attachment: Attachment, onRemove: () -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = when (attachment.type) {
@@ -140,11 +154,20 @@ fun AttachmentItem(attachment: Attachment, onRemove: () -> Unit) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(text = attachment.fileName, style = MaterialTheme.typography.bodySmall, maxLines = 1)
-                    Text(text = formatFileSize(attachment.size), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                    Text(
+                        text = formatFileSize(attachment.size),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
                 }
             }
             IconButton(onClick = onRemove, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.Close, stringResource(R.string.remove_attachment), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    Icons.Default.Close,
+                    stringResource(R.string.remove_attachment),
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
@@ -157,40 +180,28 @@ fun AttachmentPickerDialog(
 ) {
     val context = LocalContext.current
     
-    // Document Picker
     val documentPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            onFileSelected(createAttachmentFromUri(context, it, AttachmentType.DOCUMENT))
-        }
+        uri?.let { onFileSelected(createAttachmentFromUri(context, it, AttachmentType.DOCUMENT)) }
     }
     
-    // Photo Picker
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            onFileSelected(createAttachmentFromUri(context, it, AttachmentType.PHOTO))
-        }
+        uri?.let { onFileSelected(createAttachmentFromUri(context, it, AttachmentType.PHOTO)) }
     }
     
-    // Video Picker
     val videoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            onFileSelected(createAttachmentFromUri(context, it, AttachmentType.VIDEO))
-        }
+        uri?.let { onFileSelected(createAttachmentFromUri(context, it, AttachmentType.VIDEO)) }
     }
     
-    // Music Picker
     val musicPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            onFileSelected(createAttachmentFromUri(context, it, AttachmentType.MUSIC))
-        }
+        uri?.let { onFileSelected(createAttachmentFromUri(context, it, AttachmentType.MUSIC)) }
     }
     
     AlertDialog(
@@ -199,16 +210,20 @@ fun AttachmentPickerDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { documentPicker.launch("*/*") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Description, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.attach_document))
+                    Icon(Icons.Default.Description, null); Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.attach_document))
                 }
                 OutlinedButton(onClick = { photoPicker.launch("image/*") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Image, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.attach_photo))
+                    Icon(Icons.Default.Image, null); Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.attach_photo))
                 }
                 OutlinedButton(onClick = { videoPicker.launch("video/*") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.attach_video))
+                    Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.attach_video))
                 }
                 OutlinedButton(onClick = { musicPicker.launch("audio/*") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.MusicNote, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.attach_music))
+                    Icon(Icons.Default.MusicNote, null); Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.attach_music))
                 }
             }
         },

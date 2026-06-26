@@ -94,22 +94,25 @@ fun NoteScreen(viewModel: NoteViewModel) {
             }
         }
     }
-    
-    // Di dalam NoteScreen.kt, update bagian NoteDialog:
+    // Di NoteScreen.kt, update bagian NoteDialog:
     if (showDialog) {
+        val existingAttachments = remember(selectedNote) {
+            if (selectedNote != null) {
+                // Ambil attachments yang sudah ada
+                viewModel.getAttachmentsForNoteOnce(selectedNote!!.id)
+            } else {
+                emptyList()
+            }
+        }
+        
         NoteDialog(
             note = selectedNote,
             onDismiss = { showDialog = false },
-            onSave = { note ->
-                viewModel.saveNote(note)
+            onSave = { note, attachments ->
+                viewModel.saveNoteWithAttachments(note, attachments)
                 showDialog = false
             },
-            onAttachmentAdded = { attachment ->
-                // Simpan attachment ke database
-                if (selectedNote != null) {
-                    viewModel.saveAttachment(attachment.copy(noteId = selectedNote!!.id))
-                }
-            }
+            existingAttachments = existingAttachments
         )
     }
     

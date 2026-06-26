@@ -24,13 +24,10 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
     val notes: StateFlow<List<Note>> = dao.getAllNotes()
         .let { flow ->
             val stateFlow = MutableStateFlow<List<Note>>(emptyList())
-            viewModelScope.launch {
-                flow.collect { stateFlow.value = it }
-            }
+            viewModelScope.launch { flow.collect { stateFlow.value = it } }
             stateFlow.asStateFlow()
         }
     
-    // Language - Opsi B: String biasa
     var currentLanguage by mutableStateOf("en")
         private set
     
@@ -45,36 +42,47 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
     
-    fun saveNote(note: Note) {
+    // Save note dengan attachments
+    fun saveNoteWithAttachments(note: Note, attachments: List<Attachment>) {
         viewModelScope.launch {
-            if (note.id == 0) dao.insertNote(note)
-            else dao.updateNote(note)
+            // Simpan note dulu
+            if (note.id == 0) {
+                dao.insertNote(note)
+            } else {
+                dao.updateNote(note)
+                // Hapus attachments lama
+                attachmentDao.deleteAttachmentsForNote(note.id)
+            }
+            
+            // Simpan attachments dengan noteId yang benar
+            attachments.forEach { attachment ->
+                attachmentDao.insertAttachment(
+                    attachment.copy(noteId = note.id)
+                )
+            }
         }
     }
     
     fun deleteNote(note: Note) {
-        viewModelScope.launch { dao.deleteNote(note) }
+        viewModelScope.launch {
+            attachmentDao.deleteAttachmentsForNote(note.id)
+            dao.deleteNote(note)
+        }
     }
     
     fun deleteAllNotes() {
-        viewModelScope.launch { dao.deleteAllNotes() }
+        viewModelScope.launch {
+            dao.deleteAllNotes()
+        }
     }
     
-    fun saveAttachment(attachment: Attachment) {
-        viewModelScope.launch { attachmentDao.insertAttachment(attachment) }
-    }
-    
-    fun getAttachmentsForNote(noteId: Int): StateFlow<List<Attachment>> {
-        return attachmentDao.getAttachmentsForNote(noteId)
-            .let { flow ->
-                val stateFlow = MutableStateFlow<List<Attachment>>(emptyList())
-                viewModelScope.launch { flow.collect { stateFlow.value = it } }
-                stateFlow.asStateFlow()
-            }
-    }
-    
-    fun deleteAttachment(attachment: Attachment) {
-        viewModelScope.launch { attachmentDao.deleteAttachment(attachment) }
+    fun getAttachmentsForNoteOnce(noteId: Int): List<Attachment> {
+        // Untuk mengambil attachments saat edit
+        var result = emptyList<Attachment>()
+        viewModelScope.launch {
+            result = attachmentDao.getAttachmentsForNoteOnce(noteId)
+        }
+        return result
     }
     
     fun backupNotes(uri: Uri) {
