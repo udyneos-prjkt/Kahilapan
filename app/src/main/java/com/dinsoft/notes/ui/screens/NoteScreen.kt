@@ -117,7 +117,6 @@ fun NoteScreen(viewModel: NoteViewModel) {
         SettingsScreen(
             onBack = { showSettings = false },
             onLanguageChange = { language ->
-                // Update locale
                 viewModel.setLanguage(language)
             },
             currentLanguage = viewModel.currentLanguage

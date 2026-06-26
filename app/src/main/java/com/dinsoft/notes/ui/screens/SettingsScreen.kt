@@ -20,18 +20,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dinsoft.notes.R
 import com.dinsoft.notes.ui.component.AboutDeveloperDialog
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     onLanguageChange: (String) -> Unit,
-    currentLanguage: StateFlow<String>
+    currentLanguage: StateFlow<String>  // ← Gunakan StateFlow
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val language by currentLanguage.collectAsState()
+    val language by currentLanguage.collectAsState()  // ← Collect StateFlow
     
     Scaffold(
         topBar = {
@@ -59,11 +60,11 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.language),
-                    subtitle = if (currentLanguage == "en") stringResource(R.string.english) else stringResource(R.string.indonesian),
+                    subtitle = if (language == "en") stringResource(R.string.english) else stringResource(R.string.indonesian),
                     onClick = { showLanguageDialog = true }
                 )
                 
-                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
+                Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
                 SettingsItem(
                     icon = Icons.Default.Palette,
@@ -96,7 +97,7 @@ fun SettingsScreen(
                     onClick = { showAboutDialog = true }
                 )
                 
-                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
+                Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
                 SettingsItem(
                     icon = Icons.Default.Star,
@@ -110,7 +111,7 @@ fun SettingsScreen(
                     }
                 )
                 
-                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
+                Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
                 SettingsItem(
                     icon = Icons.Default.Share,
@@ -119,13 +120,13 @@ fun SettingsScreen(
                     onClick = {
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, "Download Kahilapan Notes App!")
+                            putExtra(Intent.EXTRA_TEXT, "Download Kahilapan Notes App: https://play.google.com/store/apps/details?id=com.dinsoft.notes")
                         }
                         context.startActivity(Intent.createChooser(intent, "Share via"))
                     }
                 )
                 
-                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
+                Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
                 SettingsItem(
                     icon = Icons.Default.Policy,
@@ -139,7 +140,7 @@ fun SettingsScreen(
                     }
                 )
                 
-                Divider(modifier = Modifier.padding(horizontal = 16.dp)) // ← GANTI
+                Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
                 SettingsItem(
                     icon = Icons.Default.Info,
@@ -156,7 +157,9 @@ fun SettingsScreen(
                 text = "Kahilapan © ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 textAlign = TextAlign.Center
             )
         }
@@ -170,18 +173,43 @@ fun SettingsScreen(
             text = {
                 Column {
                     Row(
-                        modifier = Modifier.fillMaxWidth().clickable { onLanguageChange("en"); showLanguageDialog = false }.padding(vertical = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onLanguageChange("en")
+                                showLanguageDialog = false
+                            }
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        RadioButton(selected = currentLanguage == "en", onClick = { onLanguageChange("en"); showLanguageDialog = false })
+                        RadioButton(
+                            selected = language == "en",
+                            onClick = {
+                                onLanguageChange("en")
+                                showLanguageDialog = false
+                            }
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.english))
                     }
+                    
                     Row(
-                        modifier = Modifier.fillMaxWidth().clickable { onLanguageChange("in"); showLanguageDialog = false }.padding(vertical = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onLanguageChange("in")
+                                showLanguageDialog = false
+                            }
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        RadioButton(selected = currentLanguage == "in", onClick = { onLanguageChange("in"); showLanguageDialog = false })
+                        RadioButton(
+                            selected = language == "in",
+                            onClick = {
+                                onLanguageChange("in")
+                                showLanguageDialog = false
+                            }
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.indonesian))
                     }
@@ -202,7 +230,10 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+fun SettingsSection(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column {
         Text(
             text = title,
@@ -210,9 +241,14 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
+        
         Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
         ) {
             Column(content = content)
         }
@@ -227,15 +263,39 @@ fun SettingsItem(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        
         Spacer(modifier = Modifier.width(16.dp))
+        
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
         }
-        Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f), modifier = Modifier.size(20.dp))
+        
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
