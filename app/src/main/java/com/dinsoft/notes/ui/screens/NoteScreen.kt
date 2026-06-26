@@ -113,13 +113,14 @@ fun NoteScreen(viewModel: NoteViewModel) {
         )
     }
     
+   
     if (showSettings) {
         SettingsScreen(
             onBack = { showSettings = false },
             onLanguageChange = { language ->
                 viewModel.setLanguage(language)
             },
-            currentLanguage = viewModel.currentLanguage
+            currentLanguage = viewModel.currentLanguage  // ← Langsung String, tidak pakai .value
         )
     }
     // Delete Confirmation

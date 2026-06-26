@@ -30,8 +30,9 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
             stateFlow.asStateFlow()
         }
     
-    // Language support
+    // Language - Opsi B: String biasa
     var currentLanguage by mutableStateOf("en")
+        private set
     
     fun setLanguage(language: String) {
         currentLanguage = language
@@ -44,67 +45,45 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
         context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
     
-    // Note functions
     fun saveNote(note: Note) {
         viewModelScope.launch {
-            if (note.id == 0) {
-                dao.insertNote(note)
-            } else {
-                dao.updateNote(note)
-            }
+            if (note.id == 0) dao.insertNote(note)
+            else dao.updateNote(note)
         }
     }
     
     fun deleteNote(note: Note) {
-        viewModelScope.launch {
-            dao.deleteNote(note)
-        }
+        viewModelScope.launch { dao.deleteNote(note) }
     }
     
     fun deleteAllNotes() {
-        viewModelScope.launch {
-            dao.deleteAllNotes()
-        }
+        viewModelScope.launch { dao.deleteAllNotes() }
     }
     
-    // Attachment functions
     fun saveAttachment(attachment: Attachment) {
-        viewModelScope.launch {
-            attachmentDao.insertAttachment(attachment)
-        }
+        viewModelScope.launch { attachmentDao.insertAttachment(attachment) }
     }
     
     fun getAttachmentsForNote(noteId: Int): StateFlow<List<Attachment>> {
         return attachmentDao.getAttachmentsForNote(noteId)
             .let { flow ->
                 val stateFlow = MutableStateFlow<List<Attachment>>(emptyList())
-                viewModelScope.launch {
-                    flow.collect { stateFlow.value = it }
-                }
+                viewModelScope.launch { flow.collect { stateFlow.value = it } }
                 stateFlow.asStateFlow()
             }
     }
     
     fun deleteAttachment(attachment: Attachment) {
-        viewModelScope.launch {
-            attachmentDao.deleteAttachment(attachment)
-        }
+        viewModelScope.launch { attachmentDao.deleteAttachment(attachment) }
     }
     
-    // Backup functions
     fun backupNotes(uri: Uri) {
-        viewModelScope.launch {
-            backupManager.backupNotes(uri)
-        }
+        viewModelScope.launch { backupManager.backupNotes(uri) }
     }
     
     fun restoreNotes(uri: Uri) {
-        viewModelScope.launch {
-            backupManager.restoreNotes(uri)
-        }
+        viewModelScope.launch { backupManager.restoreNotes(uri) }
     }
     
-    fun getBackupFileName(): String {
-        return backupManager.generateBackupFileName()
-    }
+    fun getBackupFileName(): String = backupManager.generateBackupFileName()
 }
